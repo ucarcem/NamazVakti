@@ -16,9 +16,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun providePrayerTimeRepository(
-        prayerTimeDao: PrayerTimeDao,
-        prayerApi: PrayerApi
+        prayerApi: PrayerApi,
+        prayerTimeDao: PrayerTimeDao
     ): PrayerTimeRepository {
-        return PrayerTimeRepository(prayerTimeDao, prayerApi)
+        return PrayerTimeRepository(prayerApi, prayerTimeDao)
     }
 }

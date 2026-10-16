@@ -4,6 +4,7 @@ data class LocationUiState(
     val searchQuery: String = "",
     val cities: List<String> = emptyList(),
     val isLoading: Boolean = false,
+    val isLocationSaved: Boolean = false,
     val isSaved: Boolean = false,
     val errorMessage: String? = null
 )

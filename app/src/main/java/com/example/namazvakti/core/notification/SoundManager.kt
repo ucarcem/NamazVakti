@@ -22,7 +22,7 @@ class SoundManager @Inject constructor(
             val soundUri = customSoundUri ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
 
             mediaPlayer = MediaPlayer().apply {
-                setContext(context, soundUri)
+                setDataSource(context, soundUri)
                 setAudioAttributes(
                     AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)

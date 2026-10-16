@@ -1,6 +1,7 @@
 package com.example.namazvakti.core.worker
 
 import android.content.Context
+import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -28,18 +29,28 @@ class PrayerSyncWorker @AssistedInject constructor(
             val city = settings.selectedCity
 
             if (city.isNotBlank()) {
-                // Şehrin güncel ay vakitlerini indirip Room DB'ye kaydet
+                Log.d("PrayerSyncWorker", "Arka plan senkronizasyonu başlatıldı: $city")
+
+                // Şehrin güncel ay vakitlerini indir ve DB'ye yaz
                 prayerTimeRepository.fetchAndSavePrayerTimesForMonth(city)
 
-                // Gelecek alarmları ve ana ekran widget'larını yenile
+                // Gelecek alarmları ve ana ekran widget'larını güncelle
                 schedulePrayerAlarmsUseCase()
                 prayerWidgetUpdater.updateAllWidgets()
+
+                Log.d("PrayerSyncWorker", "Arka plan senkronizasyonu başarıyla tamamlandı.")
             }
 
             Result.success()
         } catch (e: Exception) {
-            e.printStackTrace()
-            Result.retry()
+            Log.e("PrayerSyncWorker", "Arka plan senkronizasyon hatası: ${e.localizedMessage}", e)
+
+            // Eğer 3 defadan fazla hata alındıysa yeniden denemeyi durdur
+            if (runAttemptCount > 3) {
+                Result.failure()
+            } else {
+                Result.retry()
+            }
         }
     }
 }
