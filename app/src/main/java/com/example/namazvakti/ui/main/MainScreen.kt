@@ -17,7 +17,8 @@ import com.example.namazvakti.ui.main.components.PrayerCountdownHeader
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
-    onNavigateToLocation: () -> Unit
+    onNavigateToLocation: () -> Unit,
+    onNavigateToSettings: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scrollState = rememberScrollState()
@@ -48,7 +49,8 @@ fun MainScreen(
                     dateFormatted = uiState.currentDateFormatted,
                     nextPrayerName = uiState.nextPrayerName,
                     remainingTimeFormatted = uiState.remainingTimeFormatted,
-                    onLocationClick = onNavigateToLocation
+                    onLocationClick = onNavigateToLocation,
+                    onSettingsClick = onNavigateToSettings
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
