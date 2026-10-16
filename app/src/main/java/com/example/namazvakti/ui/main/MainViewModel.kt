@@ -2,6 +2,7 @@ package com.example.namazvakti.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.namazvakti.core.widget.PrayerWidgetUpdater
 import com.example.namazvakti.data.local.datastore.UserPreferencesRepository
 import com.example.namazvakti.data.repository.PrayerTimeRepository
 import com.example.namazvakti.domain.usecase.SchedulePrayerAlarmsUseCase
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val prayerTimeRepository: PrayerTimeRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val schedulePrayerAlarmsUseCase: SchedulePrayerAlarmsUseCase // YENİ INJECT
+    private val schedulePrayerAlarmsUseCase: SchedulePrayerAlarmsUseCase,
+    private val prayerWidgetUpdater: PrayerWidgetUpdater // YENİ INJECT
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState())
@@ -68,8 +70,11 @@ class MainViewModel @Inject constructor(
                     }
                     calculateNextPrayerAndRemainingTime()
 
-                    // Vakitler yüklendiğinde gelecek tüm alarmları kuruyoruz
+                    // Alarmları güncelle
                     schedulePrayerAlarmsUseCase()
+
+                    // Widget verilerini güncelle
+                    prayerWidgetUpdater.updateAllWidgets()
                 } else {
                     _uiState.update {
                         it.copy(
