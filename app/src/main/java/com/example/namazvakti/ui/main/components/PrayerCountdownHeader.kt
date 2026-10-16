@@ -17,6 +17,7 @@ fun PrayerCountdownHeader(
     nextPrayerName: String,
     remainingTimeFormatted: String,
     onLocationClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -33,7 +34,7 @@ fun PrayerCountdownHeader(
                 .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Şehir ve Konum Değiştirme Butonu
+            // Şehir Bilgisi, Konum Değiştirme ve Ayarlar Butonları
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -55,16 +56,32 @@ fun PrayerCountdownHeader(
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                OutlinedButton(
-                    onClick = onLocationClick,
-                    shape = RoundedCornerShape(12.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "Değiştir",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
-                    )
+                Row {
+                    OutlinedButton(
+                        onClick = onLocationClick,
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "Şehir",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    OutlinedButton(
+                        onClick = onSettingsClick,
+                        shape = RoundedCornerShape(12.dp),
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = "Ayarlar",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 

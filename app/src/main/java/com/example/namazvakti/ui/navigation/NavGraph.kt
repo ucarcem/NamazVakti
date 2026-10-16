@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.namazvakti.ui.location.LocationSelectionScreen
 import com.example.namazvakti.ui.main.MainScreen
+import com.example.namazvakti.ui.settings.SettingsScreen
 
 @Composable
 fun NavGraph(
@@ -16,7 +17,6 @@ fun NavGraph(
         navController = navController,
         startDestination = startDestination
     ) {
-        // Şehir Seçim Ekranı
         composable(route = Screen.LocationSelection.route) {
             LocationSelectionScreen(
                 onLocationSelected = {
@@ -27,11 +27,22 @@ fun NavGraph(
             )
         }
 
-        // Ana Ekran (MainScreen Entegre Edildi)
         composable(route = Screen.Main.route) {
             MainScreen(
                 onNavigateToLocation = {
                     navController.navigate(Screen.LocationSelection.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
+                }
+            )
+        }
+
+        // Ayarlar Ekranı Rotalaması
+        composable(route = Screen.Settings.route) {
+            SettingsScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
