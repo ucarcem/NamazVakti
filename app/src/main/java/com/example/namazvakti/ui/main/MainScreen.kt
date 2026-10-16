@@ -14,6 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.namazvakti.ui.common.NotificationPermissionHandler
 import com.example.namazvakti.ui.main.components.DailyPrayerList
 import com.example.namazvakti.ui.main.components.PrayerCountdownHeader
 
@@ -35,6 +36,9 @@ fun MainScreen(
                 .verticalScroll(scrollState)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Android 13+ Bildirim İzni Uyarı Kartı
+            NotificationPermissionHandler()
 
             when {
                 uiState.isLoading -> {
