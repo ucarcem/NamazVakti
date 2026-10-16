@@ -1,7 +1,6 @@
 package com.example.namazvakti.ui.alarm
 
 import android.content.Context
-import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Build
@@ -10,7 +9,7 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.background
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -22,14 +21,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.namazvakti.R
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.namazvakti.core.theme.NamazVaktiTheme
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import java.time.Duration
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
+@AndroidEntryPoint
 class AlarmActivity : ComponentActivity() {
+
+    private val viewModel: AlarmViewModel by viewModels()
 
     companion object {
         private var mediaPlayer: MediaPlayer? = null
@@ -37,7 +40,6 @@ class AlarmActivity : ComponentActivity() {
         fun startAlarmSound(context: Context) {
             if (mediaPlayer == null) {
                 try {
-                    // res/raw/ezan.mp3 varsa onu çalar, yoksa varsayılan alarm sesini çalar
                     val rawId = context.resources.getIdentifier("ezan", "raw", context.packageName)
                     mediaPlayer = if (rawId != 0) {
                         MediaPlayer.create(context, rawId)
@@ -54,7 +56,18 @@ class AlarmActivity : ComponentActivity() {
                             prepare()
                         }
                     }
-                    mediaPlayer?.isLooping = false
+
+                    // En fazla 10 defa çalacak sayaç mantığı
+                    var playCount = 0
+                    mediaPlayer?.setOnCompletionListener { mp ->
+                        playCount++
+                        if (playCount < 10) {
+                            mp.start()
+                        } else {
+                            stopAlarmSound()
+                        }
+                    }
+
                     mediaPlayer?.start()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -63,16 +76,20 @@ class AlarmActivity : ComponentActivity() {
         }
 
         fun stopAlarmSound() {
-            mediaPlayer?.stop()
-            mediaPlayer?.release()
-            mediaPlayer = null
+            try {
+                mediaPlayer?.stop()
+                mediaPlayer?.release()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            } finally {
+                mediaPlayer = null
+            }
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Cihaz kilitliyse ekranı yak ve kilit üstünde göster
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
             setShowWhenLocked(true)
             setTurnScreenOn(true)
@@ -85,33 +102,31 @@ class AlarmActivity : ComponentActivity() {
             )
         }
 
-        val cityName = intent.getStringExtra("CITY_NAME") ?: "Mersin"
-        val prayerName = intent.getStringExtra("PRAYER_NAME") ?: "Vakit"
-        val prayerTime = intent.getStringExtra("PRAYER_TIME") ?: "--:--"
-        val nextPrayerTime = intent.getStringExtra("NEXT_PRAYER_TIME") ?: "--:--"
+        val intentCity = intent.getStringExtra("CITY_NAME")
+        val intentPrayerName = intent.getStringExtra("PRAYER_NAME")
+        val intentPrayerTime = intent.getStringExtra("PRAYER_TIME")
+        val intentNextPrayerTime = intent.getStringExtra("NEXT_PRAYER_TIME")
+
+        viewModel.initAlarmData(intentCity, intentPrayerName, intentPrayerTime, intentNextPrayerTime)
 
         startAlarmSound(this)
 
         setContent {
             NamazVaktiTheme {
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
                 AlarmScreenContent(
-                    cityName = cityName,
-                    prayerName = prayerName,
-                    prayerTime = prayerTime,
-                    nextPrayerTime = nextPrayerTime,
-                    onCloseClick = {
-                        // Ekran kapanır ama Ezan sesi stopAlarmSound() çağrılmadığı için çalmaya devam eder
-                        finish()
-                    },
-                    onMuteClick = {
-                        stopAlarmSound()
-                    }
+                    cityName = uiState.cityName,
+                    prayerName = uiState.prayerName,
+                    prayerTime = uiState.prayerTime,
+                    nextPrayerTime = uiState.nextPrayerTime,
+                    onCloseClick = { finish() },
+                    onMuteClick = { stopAlarmSound() }
                 )
             }
         }
     }
 
-    // Fiziksel Ses Kısma Tuşuna basıldığında sesi sustur
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN || keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
             stopAlarmSound()
@@ -130,10 +145,10 @@ fun AlarmScreenContent(
     onCloseClick: () -> Unit,
     onMuteClick: () -> Unit
 ) {
-    var remainingTimeText by remember { mutableStateOf("--:--:--") }
+    var remainingTimeText by remember(nextPrayerTime) { mutableStateOf("--:--:--") }
 
-    // Kalan süreyi saniye saniye hesaplayan Sayaç
-    LaunchedEffect(Unit) {
+    LaunchedEffect(nextPrayerTime) {
+        if (nextPrayerTime == "--:--" || nextPrayerTime.isBlank()) return@LaunchedEffect
         val formatter = DateTimeFormatter.ofPattern("HH:mm")
         while (true) {
             try {
@@ -168,13 +183,18 @@ fun AlarmScreenContent(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Şehir ve Vakit İsmi
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            // Şehir ve Vakit İsmi (Ortalanmış)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
                     text = cityName,
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -184,18 +204,22 @@ fun AlarmScreenContent(
                     fontSize = 32.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = Color(0xFF2ECC71),
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
                     text = "Vakit Saati: $prayerTime",
                     fontSize = 22.sp,
                     color = Color.LightGray,
-                    modifier = Modifier.padding(top = 8.dp)
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
-            // Kalan Süre Kartı
+            // Kalan Süre Kartı (Ortalanmış)
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -204,20 +228,26 @@ fun AlarmScreenContent(
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF2C3E50))
             ) {
                 Column(
-                    modifier = Modifier.padding(20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Namazı Kılmak İçin Kalan Süre",
                         fontSize = 18.sp,
-                        color = Color.LightGray
+                        color = Color.LightGray,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = remainingTimeText,
                         fontSize = 36.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = Color.White,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -227,7 +257,6 @@ fun AlarmScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                // Sesi Sustur Butonu
                 OutlinedButton(
                     onClick = onMuteClick,
                     modifier = Modifier
@@ -235,10 +264,9 @@ fun AlarmScreenContent(
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Sesi Sustur", fontSize = 18.sp, color = Color.White)
+                    Text("Sesi Sustur", fontSize = 18.sp, color = Color.White, textAlign = TextAlign.Center)
                 }
 
-                // Ekranı Kapat Butonu (Ezan çalmaya devam eder)
                 Button(
                     onClick = onCloseClick,
                     modifier = Modifier
@@ -247,7 +275,7 @@ fun AlarmScreenContent(
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1E8449))
                 ) {
-                    Text("Ekranı Kapat", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                    Text("Ekranı Kapat", fontSize = 20.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                 }
             }
         }
