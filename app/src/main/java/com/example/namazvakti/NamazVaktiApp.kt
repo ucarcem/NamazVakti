@@ -2,7 +2,7 @@ package com.example.namazvakti
 
 import android.app.Application
 import androidx.hilt.work.HiltWorkerFactory
-import androidx.work.Configuration
+import androidx.work.Configuration // DOĞRU IMPORT: androidx.work.Configuration
 import com.example.namazvakti.core.worker.PrayerSyncScheduler
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -18,7 +18,7 @@ class NamazVaktiApp : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-        // Uygulama başlatıldığında periyodik veri senkronizasyonunu ayarla
+        // Uygulama başlatıldığında periyodik veri senkronizasyonunu başlat
         prayerSyncScheduler.schedulePeriodicSync()
     }
 
