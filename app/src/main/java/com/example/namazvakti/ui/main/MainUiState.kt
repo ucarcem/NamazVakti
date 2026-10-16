@@ -9,5 +9,6 @@ data class MainUiState(
     val remainingTimeFormatted: String = "00:00:00",
     val currentDateFormatted: String = "",
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val isOnline: Boolean = true
 )

@@ -2,6 +2,7 @@ package com.example.namazvakti.ui.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.namazvakti.core.network.NetworkObserver
 import com.example.namazvakti.core.widget.PrayerWidgetUpdater
 import com.example.namazvakti.data.local.datastore.UserPreferencesRepository
 import com.example.namazvakti.data.repository.PrayerTimeRepository
@@ -27,7 +28,8 @@ class MainViewModel @Inject constructor(
     private val prayerTimeRepository: PrayerTimeRepository,
     private val userPreferencesRepository: UserPreferencesRepository,
     private val schedulePrayerAlarmsUseCase: SchedulePrayerAlarmsUseCase,
-    private val prayerWidgetUpdater: PrayerWidgetUpdater // YENİ INJECT
+    private val prayerWidgetUpdater: PrayerWidgetUpdater,
+    private val networkObserver: NetworkObserver // YENİ INJECT
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState())
@@ -35,7 +37,16 @@ class MainViewModel @Inject constructor(
 
     init {
         observeUserSettingsAndPrayerTimes()
+        observeNetworkState()
         startCountdownTicker()
+    }
+
+    private fun observeNetworkState() {
+        viewModelScope.launch {
+            networkObserver.isConnected.collect { isConnected ->
+                _uiState.update { it.copy(isOnline = isConnected) }
+            }
+        }
     }
 
     private fun observeUserSettingsAndPrayerTimes() {
@@ -69,11 +80,7 @@ class MainViewModel @Inject constructor(
                         )
                     }
                     calculateNextPrayerAndRemainingTime()
-
-                    // Alarmları güncelle
                     schedulePrayerAlarmsUseCase()
-
-                    // Widget verilerini güncelle
                     prayerWidgetUpdater.updateAllWidgets()
                 } else {
                     _uiState.update {

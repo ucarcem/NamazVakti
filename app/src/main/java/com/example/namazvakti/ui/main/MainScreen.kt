@@ -40,6 +40,33 @@ fun MainScreen(
             // Android 13+ Bildirim İzni Uyarı Kartı
             NotificationPermissionHandler()
 
+            // Çevrimdışı Mod Bilgi Şeridi
+            if (!uiState.isOnline) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "⚡ Çevrimdışı Mod — Kayıtlı vakitler gösteriliyor",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             when {
                 uiState.isLoading -> {
                     Box(
