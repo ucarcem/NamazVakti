@@ -17,6 +17,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -91,20 +93,49 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                         "Güneş: ${prayerTimes?.sunrise ?: "--:--"} | Öğle: ${prayerTimes?.dhuhr ?: "--:--"}\nİkindi: ${prayerTimes?.asr ?: "--:--"} | Akşam: ${prayerTimes?.maghrib ?: "--:--"} | Yatsı: ${prayerTimes?.isha ?: "--:--"}"
                     )
                 } else {
+                    // FULL WIDGET (4x4+)
                     views.setTextViewText(R.id.tv_widget_title_full, "$cityText Namaz Vakitleri")
-                    views.setTextViewText(R.id.tv_widget_countdown_full, "Bugünün Vakitleri")
-                    views.setTextViewText(
-                        R.id.tv_widget_details_full,
-                        "İmsak: ${prayerTimes?.fajr ?: "--:--"}\n" +
-                                "Güneş: ${prayerTimes?.sunrise ?: "--:--"}\n" +
-                                "Öğle: ${prayerTimes?.dhuhr ?: "--:--"}\n" +
-                                "İkindi: ${prayerTimes?.asr ?: "--:--"}\n" +
-                                "Akşam: ${prayerTimes?.maghrib ?: "--:--"}\n" +
-                                "Yatsı: ${prayerTimes?.isha ?: "--:--"}"
-                    )
+                    views.setTextViewText(R.id.tv_widget_subtitle_full, "Bugünün Vakitleri")
+
+                    // Vakit saatlerini basma
+                    views.setTextViewText(R.id.tv_widget_fajr, prayerTimes?.fajr ?: "--:--")
+                    views.setTextViewText(R.id.tv_widget_sun, prayerTimes?.sunrise ?: "--:--")
+                    views.setTextViewText(R.id.tv_widget_dhuhr, prayerTimes?.dhuhr ?: "--:--")
+                    views.setTextViewText(R.id.tv_widget_asr, prayerTimes?.asr ?: "--:--")
+                    views.setTextViewText(R.id.tv_widget_maghrib, prayerTimes?.maghrib ?: "--:--")
+                    views.setTextViewText(R.id.tv_widget_isha, prayerTimes?.isha ?: "--:--")
+
+                    // Sıradaki vaktin hangisi olduğunu bulup kartını zümrüt yeşili yapma
+                    if (prayerTimes != null) {
+                        val nextPrayer = getNextPrayerIndex(
+                            prayerTimes.fajr,
+                            prayerTimes.sunrise,
+                            prayerTimes.dhuhr,
+                            prayerTimes.asr,
+                            prayerTimes.maghrib,
+                            prayerTimes.isha
+                        )
+
+                        val cards = intArrayOf(
+                            R.id.card_fajr,
+                            R.id.card_sun,
+                            R.id.card_dhuhr,
+                            R.id.card_asr,
+                            R.id.card_maghrib,
+                            R.id.card_isha
+                        )
+
+                        cards.forEachIndexed { index, cardId ->
+                            val bgRes = if (index == nextPrayer) {
+                                R.drawable.bg_widget_item_active
+                            } else {
+                                R.drawable.bg_widget_item
+                            }
+                            views.setInt(cardId, "setBackgroundResource", bgRes)
+                        }
+                    }
                 }
 
-                // Çökme hatasını çözen kısım: Tıklama olayı kendi widget_root ID'mize bağlandı
                 views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } catch (e: Exception) {
@@ -113,5 +144,26 @@ class PrayerWidgetProvider : AppWidgetProvider() {
                 pendingResult.finish()
             }
         }
+    }
+
+    private fun getNextPrayerIndex(
+        fajr: String,
+        sun: String,
+        dhuhr: String,
+        asr: String,
+        maghrib: String,
+        isha: String
+    ): Int {
+        val now = LocalTime.now()
+        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+
+        val times = listOf(fajr, sun, dhuhr, asr, maghrib, isha).map {
+            try { LocalTime.parse(it, formatter) } catch (e: Exception) { LocalTime.MIDNIGHT }
+        }
+
+        for (i in times.indices) {
+            if (now.isBefore(times[i])) return i
+        }
+        return 0 // Gün bittiyse varsayılan İmsak
     }
 }

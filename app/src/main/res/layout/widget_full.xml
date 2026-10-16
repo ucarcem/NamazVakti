@@ -7,6 +7,7 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- Şehir ve Başlık -->
     <TextView
         android:id="@+id/tv_widget_title_full"
         android:layout_width="match_parent"
@@ -17,27 +18,187 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/tv_widget_countdown_full"
+        android:id="@+id/tv_widget_subtitle_full"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="#2ECC71"
-        android:textSize="20sp"
-        android:textStyle="bold" />
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="2dp" />
 
-    <!-- View yerine RemoteViews destekli FrameLayout çizgi kullanıldı -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="12dp"
         android:background="#34495E" />
 
-    <TextView
-        android:id="@+id/tv_widget_details_full"
+    <!-- 6 Adet Yuvarlatılmış Vakit Kartı -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:lineSpacingExtra="6dp"
-        android:textColor="#ECF0F1"
-        android:textSize="15sp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <!-- İmsak -->
+        <LinearLayout
+            android:id="@+id/card_fajr"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_widget_item"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="İmsak"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_widget_fajr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Güneş -->
+        <LinearLayout
+            android:id="@+id/card_sun"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_widget_item"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Güneş"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_widget_sun"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Öğle -->
+        <LinearLayout
+            android:id="@+id/card_dhuhr"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_widget_item"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Öğle"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_widget_dhuhr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- İkindi -->
+        <LinearLayout
+            android:id="@+id/card_asr"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_widget_item"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="İkindi"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_widget_asr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Akşam -->
+        <LinearLayout
+            android:id="@+id/card_maghrib"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginBottom="6dp"
+            android:background="@drawable/bg_widget_item"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Akşam"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_widget_maghrib"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Yatsı -->
+        <LinearLayout
+            android:id="@+id/card_isha"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_widget_item"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="16dp">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Yatsı"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+            <TextView
+                android:id="@+id/tv_widget_isha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>
