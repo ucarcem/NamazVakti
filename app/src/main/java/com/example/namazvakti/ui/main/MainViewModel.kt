@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.namazvakti.data.local.datastore.UserPreferencesRepository
 import com.example.namazvakti.data.repository.PrayerTimeRepository
+import com.example.namazvakti.domain.usecase.SchedulePrayerAlarmsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +24,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val prayerTimeRepository: PrayerTimeRepository,
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val userPreferencesRepository: UserPreferencesRepository,
+    private val schedulePrayerAlarmsUseCase: SchedulePrayerAlarmsUseCase // YENİ INJECT
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(MainUiState())
@@ -47,7 +49,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
-            val todayDate = LocalDate.now().toString() // YYYY-MM-DD
+            val todayDate = LocalDate.now().toString()
             val formattedDate = LocalDate.now().format(
                 DateTimeFormatter.ofPattern("dd MMMM yyyy, EEEE", Locale("tr"))
             )
@@ -65,6 +67,9 @@ class MainViewModel @Inject constructor(
                         )
                     }
                     calculateNextPrayerAndRemainingTime()
+
+                    // Vakitler yüklendiğinde gelecek tüm alarmları kuruyoruz
+                    schedulePrayerAlarmsUseCase()
                 } else {
                     _uiState.update {
                         it.copy(
@@ -88,7 +93,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             while (true) {
                 calculateNextPrayerAndRemainingTime()
-                delay(1000) // Her saniye tetikle
+                delay(1000)
             }
         }
     }
