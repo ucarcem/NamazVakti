@@ -11,6 +11,10 @@ sealed class Screen(val route: String, val title: String? = null, val icon: Imag
     object Home : Screen("home_screen", "Ana Ekran", Icons.Default.Home)
     object Qibla : Screen("qibla_screen", "Kıble", Icons.Default.Place)
     object Settings : Screen("settings_screen", "Ayarlar", Icons.Default.Settings)
+
+    // Ayarlar Alt Ekranları
+    object FontSettings : Screen("font_settings_screen")
+    object NotificationSettings : Screen("notification_settings_screen")
 }
 
 val bottomNavItems = listOf(

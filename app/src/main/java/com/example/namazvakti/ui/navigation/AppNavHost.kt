@@ -11,6 +11,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.namazvakti.ui.location.LocationSelectionScreen
 import com.example.namazvakti.ui.main.MainScreen
 import com.example.namazvakti.ui.qibla.QiblaScreen
+import com.example.namazvakti.ui.settings.FontScaleScreen
+import com.example.namazvakti.ui.settings.NotificationSettingsScreen
 import com.example.namazvakti.ui.settings.SettingsScreen
 
 @Composable
@@ -66,9 +68,24 @@ fun AppNavHost(
 
             composable(Screen.Settings.route) {
                 SettingsScreen(
-                    onBackClick = {
-                        navController.popBackStack()
+                    onNavigateToFontSettings = {
+                        navController.navigate(Screen.FontSettings.route)
+                    },
+                    onNavigateToNotificationSettings = {
+                        navController.navigate(Screen.NotificationSettings.route)
                     }
+                )
+            }
+
+            composable(Screen.FontSettings.route) {
+                FontScaleScreen(
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+
+            composable(Screen.NotificationSettings.route) {
+                NotificationSettingsScreen(
+                    onBackClick = { navController.popBackStack() }
                 )
             }
         }

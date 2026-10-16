@@ -13,7 +13,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 
 // Uygulama genelinde mevcut font ölçeğine erişim sağlayan CompositionLocal
-val LocalFontScale = compositionLocalOf { FontScale.NORMAL }
+val LocalFontScale = compositionLocalOf { FontScale.MEDIUM }
 
 private val LightColorScheme = lightColorScheme(
     primary = LightPrimary,
@@ -38,7 +38,7 @@ private val DarkColorScheme = darkColorScheme(
 @Composable
 fun NamazVaktiTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    fontScale: FontScale = FontScale.NORMAL, // Varsayılan Normal font
+    fontScale: FontScale = FontScale.MEDIUM, // Varsayılan Normal font
     dynamicColor: Boolean = false, // Yüksek kontrast için varsayılan renk paletimizi koruyoruz
     content: @Composable () -> Unit
 ) {

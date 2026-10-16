@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
 fun getScaledTypography(fontScale: FontScale): Typography {
-    val factor = fontScale.scaleFactor
+    val factor = fontScale.scale
 
     return Typography(
         // Ana Sayaç ve Büyük Vakit İsimleri

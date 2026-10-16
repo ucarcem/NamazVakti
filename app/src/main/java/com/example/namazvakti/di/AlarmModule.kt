@@ -1,7 +1,7 @@
 package com.example.namazvakti.di
 
 import com.example.namazvakti.core.alarm.AlarmScheduler
-import com.example.namazvakti.core.alarm.PrayerAlarmSchedulerImpl
+import com.example.namazvakti.core.alarm.PrayerAlarmScheduler
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -15,6 +15,6 @@ abstract class AlarmModule {
     @Binds
     @Singleton
     abstract fun bindAlarmScheduler(
-        prayerAlarmSchedulerImpl: PrayerAlarmSchedulerImpl
+        prayerAlarmScheduler: PrayerAlarmScheduler
     ): AlarmScheduler
 }
