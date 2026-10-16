@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -17,7 +18,6 @@ fun PrayerTimeItem(
     isNext: Boolean,
     modifier: Modifier = Modifier
 ) {
-    // Sıradaki vakitse koyu/canlı renk, diğer vakitlerde sade zemin
     val cardColors = if (isNext) {
         CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary,
@@ -39,7 +39,8 @@ fun PrayerTimeItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(min = 60.dp),
+            // Sabit height yerine min height vererek büyük fontta kartın dikeyde uzamasını sağlıyoruz
+            .heightIn(min = 64.dp),
         shape = RoundedCornerShape(16.dp),
         colors = cardColors,
         border = border,
@@ -55,12 +56,19 @@ fun PrayerTimeItem(
             Text(
                 text = prayerName,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = if (isNext) FontWeight.ExtraBold else FontWeight.Bold
+                fontWeight = if (isNext) FontWeight.ExtraBold else FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false)
             )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
             Text(
                 text = prayerTime,
                 style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold
+                fontWeight = FontWeight.ExtraBold,
+                maxLines = 1
             )
         }
     }

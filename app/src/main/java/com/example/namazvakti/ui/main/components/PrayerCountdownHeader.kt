@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -38,7 +39,7 @@ fun PrayerCountdownHeader(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = city.uppercase(),
                         style = MaterialTheme.typography.titleLarge,
@@ -52,9 +53,12 @@ fun PrayerCountdownHeader(
                     )
                 }
 
+                Spacer(modifier = Modifier.width(8.dp))
+
                 OutlinedButton(
                     onClick = onLocationClick,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
                         text = "Değiştir",
@@ -70,12 +74,13 @@ fun PrayerCountdownHeader(
             Text(
                 text = if (nextPrayerName.isNotBlank()) "$nextPrayerName Vaktine Kalan Süre" else "Hesaplanıyor...",
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                textAlign = TextAlign.Center
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Yaşlı ve Görme Güçlüğü Çeken Bireyler İçin Dev Kalan Süre Sayacı
+            // Yaşlı Bireyler İçin Esnek Dev Sayaç
             Surface(
                 shape = RoundedCornerShape(16.dp),
                 color = MaterialTheme.colorScheme.surface,
@@ -86,7 +91,8 @@ fun PrayerCountdownHeader(
                     style = MaterialTheme.typography.displayLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp)
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
                 )
             }
         }
