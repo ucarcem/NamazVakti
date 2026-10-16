@@ -3,7 +3,6 @@ package com.example.namazvakti.ui.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.namazvakti.data.local.datastore.UserPreferencesRepository
-import com.example.namazvakti.data.local.entity.PrayerTimeEntity
 import com.example.namazvakti.data.repository.PrayerTimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -13,10 +12,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.Duration
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
@@ -44,21 +43,43 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun loadTodayPrayerTimes() {
+    fun loadTodayPrayerTimes() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
             val todayDate = LocalDate.now().toString() // YYYY-MM-DD
             val formattedDate = LocalDate.now().format(
                 DateTimeFormatter.ofPattern("dd MMMM yyyy, EEEE", Locale("tr"))
             )
 
-            val prayerTimes = prayerTimeRepository.getPrayerTimesByDate(todayDate)
+            try {
+                val prayerTimes = prayerTimeRepository.getPrayerTimesByDate(todayDate)
 
-            _uiState.update {
-                it.copy(
-                    todayPrayerTimes = prayerTimes,
-                    currentDateFormatted = formattedDate,
-                    isLoading = false
-                )
+                if (prayerTimes != null) {
+                    _uiState.update {
+                        it.copy(
+                            todayPrayerTimes = prayerTimes,
+                            currentDateFormatted = formattedDate,
+                            isLoading = false,
+                            errorMessage = null
+                        )
+                    }
+                    calculateNextPrayerAndRemainingTime()
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            errorMessage = "Bugüne ait namaz vakitleri bulunamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin."
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Veriler yüklenirken bir hata oluştu: ${e.localizedMessage}"
+                    )
+                }
             }
         }
     }
@@ -67,7 +88,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             while (true) {
                 calculateNextPrayerAndRemainingTime()
-                delay(1000) // Her saniye sayacı güncelle
+                delay(1000) // Her saniye tetikle
             }
         }
     }
@@ -109,7 +130,6 @@ class MainViewModel @Inject constructor(
             }
         }
 
-        // Eğer bugünkü tüm vakitler geçtiyse sonraki vakit yarının İmsak vaktidir
         if (!foundNext) {
             try {
                 val tomorrowFajr = LocalDateTime.of(
