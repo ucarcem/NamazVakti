@@ -3,41 +3,48 @@ package com.example.namazvakti
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.example.namazvakti.core.theme.FontScale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.rememberNavController
+import com.example.namazvakti.data.local.datastore.UserPreferencesRepository
 import com.example.namazvakti.core.theme.NamazVaktiTheme
+import com.example.namazvakti.ui.navigation.NavGraph
+import com.example.namazvakti.ui.navigation.Screen
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    @Inject
+    lateinit var userPreferencesRepository: UserPreferencesRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            // Test amacıyla LARGE (Büyük) font ölçeği ile başlatıyoruz
-            NamazVaktiTheme(fontScale = FontScale.LARGE) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = "Namaz Vakti",
-                            style = MaterialTheme.typography.displayLarge
-                        )
-                        Text(
-                            text = "Öğle: 13:02",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Text(
-                            text = "Yaşlı bireyler için büyük ve yüksek kontrastlı görünüm örneği.",
-                            style = MaterialTheme.typography.bodyLarge
+            val userSettings by userPreferencesRepository.userSettingsFlow
+                .collectAsStateWithLifecycle(initialValue = null)
+
+            userSettings?.let { settings ->
+                NamazVaktiTheme(fontScale = settings.fontScale) {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        val navController = rememberNavController()
+                        val startDestination = if (settings.selectedCity.isNotBlank()) {
+                            Screen.Main.route
+                        } else {
+                            Screen.LocationSelection.route
+                        }
+
+                        NavGraph(
+                            navController = navController,
+                            startDestination = startDestination
                         )
                     }
                 }
