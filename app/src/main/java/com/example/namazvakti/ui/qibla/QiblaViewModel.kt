@@ -37,7 +37,12 @@ class QiblaViewModel @Inject constructor(
             .map { it.selectedCity }
             .onEach { city ->
                 val selectedCityName = city.ifBlank { "Mersin" }
-                val coords = QiblaCalculator.cityCoordinates[selectedCityName] ?: Pair(36.8121, 34.6415)
+
+                // Harf büyüklüğüne duyarsız şehir eşleme (Fallback korumalı)
+                val matchedCityKey = QiblaCalculator.cityCoordinates.keys.find {
+                    it.equals(selectedCityName.trim(), ignoreCase = true)
+                }
+                val coords = QiblaCalculator.cityCoordinates[matchedCityKey] ?: Pair(36.8121, 34.6415)
                 val qiblaAngle = QiblaCalculator.calculateQiblaBearing(coords.first, coords.second)
 
                 _uiState.update {
@@ -56,11 +61,11 @@ class QiblaViewModel @Inject constructor(
                 val deviceAzimuth = sensorData.azimuth
                 val qiblaBearing = _uiState.value.qiblaBearing
 
-                // İbrenin dönmesi gereken göreceli açı (Kıble Açısı - Cihaz Açısı)
+                // İbrenin dönmesi gereken bağıl açı
                 val needleRotation = (qiblaBearing - deviceAzimuth + 360) % 360
 
-                // Cihaz Kıble yönüne (±3 derece toleransla) hizalandı mı?
-                val isFacingQibla = needleRotation in 357.0f..360.0f || needleRotation in 0.0f..3.0f
+                // Tolerans ±8 dereceye genişletildi (Kolay yakalama)
+                val isFacingQibla = needleRotation <= 8.0f || needleRotation >= 352.0f
 
                 _uiState.update {
                     it.copy(

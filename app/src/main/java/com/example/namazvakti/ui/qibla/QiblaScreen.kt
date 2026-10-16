@@ -62,38 +62,67 @@ fun QiblaScreen(
             )
         }
 
-        // Dairesel Pusula Arayüzü
+        // Pusula Gövdesi
         Box(
             modifier = Modifier
                 .size(300.dp)
                 .background(compassBgColor, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            // Pusula Kadranı (Dönen Kısım)
+            // 1. Sabit Hedef Çizgisi (Ekranın Tam Üst Ortası)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 8.dp)
+                    .width(4.dp)
+                    .height(16.dp)
+                    .background(Color.White)
+            )
+
+            // 2. Sabit Dış Çember
+            Canvas(modifier = Modifier.fillMaxSize()) {
+                val radius = size.width / 2 - 20.dp.toPx()
+                drawCircle(
+                    color = Color.White.copy(alpha = 0.2f),
+                    radius = radius,
+                    style = Stroke(width = 3.dp.toPx())
+                )
+            }
+
+            // 3. Cihaz Yönüne Göre Dönen Kadran ve Kuzey (N) İşaretçisi
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
                     .rotate(-uiState.deviceAzimuth)
             ) {
                 val center = Offset(size.width / 2, size.height / 2)
-                val radius = size.width / 2 - 20
+                val radius = size.width / 2 - 28.dp.toPx()
 
-                // Çember Dış Çizgisi
+                // Kırmızı Kuzey (N) Noktası
                 drawCircle(
-                    color = Color.White.copy(alpha = 0.3f),
-                    radius = radius,
-                    style = Stroke(width = 4.dp.toPx())
-                )
-
-                // Kuzey (N) İşaretçisi
-                drawCircle(
-                    color = Color.Red,
-                    radius = 8.dp.toPx(),
-                    center = Offset(center.x, center.y - radius + 20)
+                    color = Color(0xFFE74C3C),
+                    radius = 12.dp.toPx(),
+                    center = Offset(center.x, center.y - radius)
                 )
             }
 
-            // Kıble İbresi (Kâbe Yönü)
+            // Kuzey "N" Metin Etiketi
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .rotate(-uiState.deviceAzimuth),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Text(
+                    text = "N",
+                    color = Color.White,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 22.dp)
+                )
+            }
+
+            // 4. Kıble İbresi (Arama esnasında Kırmızı, Hizalanınca Yeşil)
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
@@ -101,12 +130,11 @@ fun QiblaScreen(
             ) {
                 val center = Offset(size.width / 2, size.height / 2)
 
-                // Ok Çizimi
                 val path = Path().apply {
-                    moveTo(center.x, center.y - 110.dp.toPx())
-                    lineTo(center.x - 18.dp.toPx(), center.y + 20.dp.toPx())
-                    lineTo(center.x, center.y)
-                    lineTo(center.x + 18.dp.toPx(), center.y + 20.dp.toPx())
+                    moveTo(center.x, center.y - 105.dp.toPx())
+                    lineTo(center.x - 20.dp.toPx(), center.y + 25.dp.toPx())
+                    lineTo(center.x, center.y + 10.dp.toPx())
+                    lineTo(center.x + 20.dp.toPx(), center.y + 25.dp.toPx())
                     close()
                 }
 
@@ -119,7 +147,7 @@ fun QiblaScreen(
             // Merkez Daire
             Box(
                 modifier = Modifier
-                    .size(24.dp)
+                    .size(20.dp)
                     .background(Color.White, CircleShape)
             )
         }
@@ -147,7 +175,10 @@ fun QiblaScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = "Lütfen telefonu düz bir zeminde tutun ve 8 şeklinde sallayarak kalibre edin.",
+                    text = if (uiState.isFacingQibla)
+                        "Hizalalandınız, namazınızı bu yöne doğru kılabilirsiniz."
+                    else
+                        "Kırmızı oku ekranın üstündeki beyaz çizgiye getirene kadar dönün.",
                     fontSize = 14.sp,
                     color = Color.LightGray,
                     textAlign = TextAlign.Center
