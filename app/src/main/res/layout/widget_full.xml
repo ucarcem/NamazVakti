@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#1B2631"
@@ -21,13 +22,15 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="#2ECC71"
-        android:textSize="28sp"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
-    <View
+    <!-- View yerine RemoteViews destekli FrameLayout çizgi kullanıldı -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginVertical="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
         android:background="#34495E" />
 
     <TextView
@@ -36,5 +39,5 @@
         android:layout_height="wrap_content"
         android:lineSpacingExtra="6dp"
         android:textColor="#ECF0F1"
-        android:textSize="16sp" />
+        android:textSize="15sp" />
 </LinearLayout>

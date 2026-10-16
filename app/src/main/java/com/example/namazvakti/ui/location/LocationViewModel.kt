@@ -27,13 +27,13 @@ class LocationViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                // 1. Şehir tercihini DataStore'a kaydet
-                userPreferencesRepository.updateSelectedCity(city)
-
-                // 2. Yeni şehrin vakitlerini API'den çek ve Room DB'ye yaz
+                // 1. Önce API'den çekip Room DB'ye yaz
                 prayerTimeRepository.fetchAndSavePrayerTimesForMonth(city)
 
-                // 3. Ana ekrandaki tüm widget'ları anında senkronize et
+                // 2. Başarılı olduysa DataStore'a kaydet
+                userPreferencesRepository.updateSelectedCity(city)
+
+                // 3. Widget'ları güncelle
                 prayerWidgetUpdater.updateAllWidgets()
 
                 _uiState.update { it.copy(isLoading = false, isLocationSaved = true) }

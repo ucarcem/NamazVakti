@@ -81,25 +81,31 @@ class PrayerWidgetProvider : AppWidgetProvider() {
 
                 if (layoutRes == R.layout.widget_compact) {
                     views.setTextViewText(R.id.tv_widget_city, cityText)
-                    views.setTextViewText(R.id.tv_widget_next_prayer, "Sonraki Vakit")
+                    views.setTextViewText(R.id.tv_widget_next_prayer, "İmsak")
                     views.setTextViewText(R.id.tv_widget_countdown, prayerTimes?.fajr ?: "--:--")
                 } else if (layoutRes == R.layout.widget_wide) {
                     views.setTextViewText(R.id.tv_widget_city_wide, cityText)
                     views.setTextViewText(R.id.tv_widget_countdown_wide, "İmsak: ${prayerTimes?.fajr ?: "--:--"}")
                     views.setTextViewText(
                         R.id.tv_widget_times_summary,
-                        "Öğle: ${prayerTimes?.dhuhr} | İkindi: ${prayerTimes?.asr} | Akşam: ${prayerTimes?.maghrib}"
+                        "Güneş: ${prayerTimes?.sunrise ?: "--:--"} | Öğle: ${prayerTimes?.dhuhr ?: "--:--"}\nİkindi: ${prayerTimes?.asr ?: "--:--"} | Akşam: ${prayerTimes?.maghrib ?: "--:--"} | Yatsı: ${prayerTimes?.isha ?: "--:--"}"
                     )
                 } else {
                     views.setTextViewText(R.id.tv_widget_title_full, "$cityText Namaz Vakitleri")
-                    views.setTextViewText(R.id.tv_widget_countdown_full, "İmsak: ${prayerTimes?.fajr}")
+                    views.setTextViewText(R.id.tv_widget_countdown_full, "Bugünün Vakitleri")
                     views.setTextViewText(
                         R.id.tv_widget_details_full,
-                        "Güneş: ${prayerTimes?.sunrise}\nÖğle: ${prayerTimes?.dhuhr}\nİkindi: ${prayerTimes?.asr}\nAkşam: ${prayerTimes?.maghrib}\nYatsı: ${prayerTimes?.isha}"
+                        "İmsak: ${prayerTimes?.fajr ?: "--:--"}\n" +
+                                "Güneş: ${prayerTimes?.sunrise ?: "--:--"}\n" +
+                                "Öğle: ${prayerTimes?.dhuhr ?: "--:--"}\n" +
+                                "İkindi: ${prayerTimes?.asr ?: "--:--"}\n" +
+                                "Akşam: ${prayerTimes?.maghrib ?: "--:--"}\n" +
+                                "Yatsı: ${prayerTimes?.isha ?: "--:--"}"
                     )
                 }
 
-                views.setOnClickPendingIntent(android.R.id.background, pendingIntent)
+                // Çökme hatasını çözen kısım: Tıklama olayı kendi widget_root ID'mize bağlandı
+                views.setOnClickPendingIntent(R.id.widget_root, pendingIntent)
                 appWidgetManager.updateAppWidget(appWidgetId, views)
             } catch (e: Exception) {
                 e.printStackTrace()

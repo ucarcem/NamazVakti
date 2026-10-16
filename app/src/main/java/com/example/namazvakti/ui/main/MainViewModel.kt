@@ -68,7 +68,14 @@ class MainViewModel @Inject constructor(
             )
 
             try {
-                val prayerTimes = prayerTimeRepository.getPrayerTimesByDate(todayDate)
+                val currentCity = _uiState.value.city
+                var prayerTimes = prayerTimeRepository.getPrayerTimesByDate(todayDate)
+
+                // Veritabanı boşsa ve şehir seçiliyse Aladhan API'den çekip kaydetmeyi dene
+                if (prayerTimes == null && currentCity.isNotBlank()) {
+                    prayerTimeRepository.fetchAndSavePrayerTimesForMonth(currentCity)
+                    prayerTimes = prayerTimeRepository.getPrayerTimesByDate(todayDate)
+                }
 
                 if (prayerTimes != null) {
                     _uiState.update {
@@ -86,7 +93,7 @@ class MainViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = "Bugüne ait namaz vakitleri bulunamadı. Lütfen internet bağlantınızı kontrol edip tekrar deneyin."
+                            errorMessage = "Bugüne ait namaz vakitleri indirilemedi. Lütfen internet bağlantınızı kontrol edip tekrar deneyin."
                         )
                     }
                 }
@@ -94,7 +101,7 @@ class MainViewModel @Inject constructor(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Veriler yüklenirken bir hata oluştu: ${e.localizedMessage}"
+                        errorMessage = "Veriler indirilirken hata oluştu: ${e.localizedMessage}"
                     )
                 }
             }
