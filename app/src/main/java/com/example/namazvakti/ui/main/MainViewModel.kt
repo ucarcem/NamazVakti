@@ -52,7 +52,12 @@ class MainViewModel @Inject constructor(
     private fun observeUserSettingsAndPrayerTimes() {
         viewModelScope.launch {
             userPreferencesRepository.userSettingsFlow.collectLatest { settings ->
-                _uiState.update { it.copy(city = settings.selectedCity) }
+                _uiState.update {
+                    it.copy(
+                        city = settings.selectedCity,
+                        fontScale = settings.fontScale
+                    )
+                }
                 loadTodayPrayerTimes()
             }
         }

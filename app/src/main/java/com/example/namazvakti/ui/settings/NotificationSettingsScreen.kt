@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.namazvakti.ui.common.NotificationPermissionHandler
 
 private data class PrayerAlarmItem(
     val key: String,
@@ -61,6 +62,8 @@ fun NotificationSettingsScreen(
                 .verticalScroll(scrollState),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            NotificationPermissionHandler()
+
             Text(
                 text = "Ezan ve bildirim uyarısı almak istediğiniz vakitleri seçin:",
                 style = MaterialTheme.typography.bodyLarge,

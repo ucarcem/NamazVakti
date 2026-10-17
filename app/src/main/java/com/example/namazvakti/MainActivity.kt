@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
                 Screen.Home.route
             }
 
-            NamazVaktiTheme {
+            NamazVaktiTheme(fontScale = uiState.fontScale) {
                 AppNavHost(
                     navController = navController,
                     startDestination = startDestination

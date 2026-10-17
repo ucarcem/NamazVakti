@@ -1,9 +1,11 @@
 package com.example.namazvakti.ui.main
 
+import com.example.namazvakti.core.theme.FontScale
 import com.example.namazvakti.data.local.entity.PrayerTimeEntity
 
 data class MainUiState(
     val city: String = "",
+    val fontScale: FontScale = FontScale.MEDIUM,
     val todayPrayerTimes: PrayerTimeEntity? = null,
     val nextPrayerName: String = "",
     val remainingTimeFormatted: String = "00:00:00",

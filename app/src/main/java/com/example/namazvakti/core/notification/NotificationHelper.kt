@@ -9,8 +9,8 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.example.namazvakti.MainActivity
 import com.example.namazvakti.R
+import com.example.namazvakti.ui.alarm.AlarmActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,14 +54,22 @@ class NotificationHelper @Inject constructor(
         }
     }
 
-    fun showPrayerNotification(prayerName: String) {
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    fun showPrayerNotification(
+        prayerName: String,
+        prayerTime: String = "",
+        cityName: String = ""
+    ) {
+        val intent = Intent(context, AlarmActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("PRAYER_NAME", prayerName)
+            putExtra("PRAYER_TIME", prayerTime)
+            putExtra("CITY_NAME", cityName)
         }
 
+        val notificationId = prayerName.hashCode()
         val pendingIntent = PendingIntent.getActivity(
             context,
-            0,
+            notificationId,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
@@ -71,17 +79,23 @@ class NotificationHelper @Inject constructor(
         val builder = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("$prayerName Vakti")
-            .setContentText("$prayerName ezanı okunuyor. Namaz vakti girdi.")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentText(if (cityName.isNotBlank()) "$cityName - $prayerName ezanı okunuyor. Namaz vakti girdi." else "$prayerName ezanı okunuyor. Namaz vakti girdi.")
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
+            .setFullScreenIntent(pendingIntent, true)
             .setAutoCancel(true)
             .setSound(soundUri)
             .setContentIntent(pendingIntent)
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.notify(NOTIFICATION_ID, builder.build())
+        notificationManager.notify(notificationId, builder.build())
 
         // Ses çalarımızı bağımsız olarak da tetikliyoruz
-        soundManager.playNotificationSound()
+        try {
+            soundManager.playNotificationSound()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
