@@ -34,9 +34,11 @@ class PrayerTimeRepository @Inject constructor(
                     method = 13
                 )
 
-                if (response.code == 200 && response.data.isNotEmpty()) {
+                if (response.code == 200 && !response.data.isNullOrEmpty()) {
                     val entities = response.data.map { it.toEntity() }
                     prayerTimeDao.insertPrayerTimes(entities)
+                } else {
+                    throw Exception("API'den geçerli vakit verisi alınamadı.")
                 }
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -38,10 +38,11 @@ class LocationViewModel @Inject constructor(
 
                 _uiState.update { it.copy(isLoading = false, isLocationSaved = true) }
             } catch (e: Exception) {
+                val errorMsg = e.localizedMessage ?: e.message ?: "Bilinmeyen hata oluştu"
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        errorMessage = "Şehir vakitleri indirilemedi: ${e.localizedMessage}"
+                        errorMessage = "Şehir vakitleri indirilemedi: $errorMsg"
                     )
                 }
             }

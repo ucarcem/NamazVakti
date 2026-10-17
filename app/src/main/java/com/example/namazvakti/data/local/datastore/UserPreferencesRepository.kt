@@ -30,7 +30,7 @@ class UserPreferencesRepository @Inject constructor(
 
     val userSettingsFlow: Flow<UserSettings> = context.dataStore.data.map { preferences ->
         UserSettings(
-            selectedCity = preferences[PreferencesKeys.SELECTED_CITY] ?: "Mersin",
+            selectedCity = preferences[PreferencesKeys.SELECTED_CITY] ?: "",
             fontScale = FontScale.valueOf(
                 preferences[PreferencesKeys.FONT_SCALE] ?: FontScale.MEDIUM.name
             ),

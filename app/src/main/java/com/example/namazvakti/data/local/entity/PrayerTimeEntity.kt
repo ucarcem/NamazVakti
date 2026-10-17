@@ -1,8 +1,10 @@
 package com.example.namazvakti.data.local.entity
 
+import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+@Keep
 @Entity(tableName = "prayer_times")
 data class PrayerTimeEntity(
     @PrimaryKey
